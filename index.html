@@ -4,29 +4,38 @@
   <meta charset="UTF-8">
   <title>tarekadel89 - SMART on FHIR App</title>
   <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
-  <!-- Add your JS files from src folder below -->
-  <!-- <script src="./src/index.js"></script> -->
 </head>
 <body>
   <h1>SMART on FHIR App</h1>
-  <div id="app">
-    <!-- App content will be rendered here -->
-  </div>
+  <div id="app">Loading patient...</div>
+
   <script>
-    // Initialize SMART client and display patient info
     FHIR.oauth2.ready().then(function(client) {
+      // Check if we have a patient context
       if (!client.patient || !client.patient.id) {
-        document.getElementById('app').innerText =
-          "Error: No patient context. Please launch this app from a SMART on FHIR environment.";
+        document.getElementById("app").innerText =
+          "Error: No patient context. Launch this app from within the EHR.";
         return;
       }
-      client.request("Patient/" + client.patient.id).then(function(patient) {
-        document.getElementById('app').innerText = 
-          "Hello, " + (patient.name && patient.name[0] ? patient.name[0].given.join(" ") + " " + patient.name[0].family : "Patient");
-      }).catch(function(error) {
-        document.getElementById('app').innerText =
-          "Failed to load patient: " + (error.message || error);
-      });
+
+      // Request the Patient resource
+      client.request("Patient/" + client.patient.id)
+        .then(function(patient) {
+          let displayName = "Unknown Patient";
+
+          if (patient.name && patient.name[0]) {
+            let given = patient.name[0].given ? patient.name[0].given.join(" ") : "";
+            let family = patient.name[0].family || "";
+            displayName = (given + " " + family).trim();
+          }
+
+          document.getElementById("app").innerText = "Hello, " + displayName;
+        })
+        .catch(function(error) {
+          console.error("Failed to load patient:", error);
+          document.getElementById("app").innerText =
+            "Failed to load patient: " + (error.message || JSON.stringify(error));
+        });
     });
   </script>
 </body>
