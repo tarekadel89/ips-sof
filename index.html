@@ -13,11 +13,19 @@
     <!-- App content will be rendered here -->
   </div>
   <script>
-    // Example: Initialize SMART client and display patient info
+    // Initialize SMART client and display patient info
     FHIR.oauth2.ready().then(function(client) {
+      if (!client.patient || !client.patient.id) {
+        document.getElementById('app').innerText =
+          "Error: No patient context. Please launch this app from a SMART on FHIR environment.";
+        return;
+      }
       client.request("Patient/" + client.patient.id).then(function(patient) {
         document.getElementById('app').innerText = 
           "Hello, " + (patient.name && patient.name[0] ? patient.name[0].given.join(" ") + " " + patient.name[0].family : "Patient");
+      }).catch(function(error) {
+        document.getElementById('app').innerText =
+          "Failed to load patient: " + (error.message || error);
       });
     });
   </script>
