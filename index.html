@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>tarekadel89 - SMART on FHIR App</title>
+  <script src="https://cdn.jsdelivr.net/npm/fhirclient/build/fhir-client.js"></script>
+  <!-- Add your JS files from src folder below -->
+  <script src="src/index.js"></script>
+</head>
+<body>
+  <h1>SMART on FHIR App</h1>
+  <div id="app">
+    <!-- App content will be rendered here -->
+  </div>
+  <script>
+    // Example: Initialize SMART client and display patient info
+    FHIR.oauth2.ready().then(function(client) {
+      client.request("Patient/" + client.patient.id).then(function(patient) {
+        document.getElementById('app').innerText = 
+          "Hello, " + (patient.name && patient.name[0] ? patient.name[0].given.join(" ") + " " + patient.name[0].family : "Patient");
+      });
+    });
+  </script>
+</body>
+</html>
